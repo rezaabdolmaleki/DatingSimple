@@ -10,11 +10,28 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    
+    @IBOutlet weak var titleLable: UILabel!
+    @IBOutlet weak var signInFacebookBtn: UIButton!
+    @IBOutlet weak var orLabel: UILabel!
+    @IBOutlet weak var signInGoogleBtn: UIButton!
+    @IBOutlet weak var createNewBtn: UIButton!
+    @IBOutlet weak var termsOfServiceLabel: UILabel!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        setupUI()
     }
 
+    func setupUI() {
+        setupHeader()
+        setupOrLabel()
+        setupTermsLabel()
+        setupGoogleButton()
+        setupFacebookButton()
+        setupCreateAccountButton()
+    }
 
 }
 
