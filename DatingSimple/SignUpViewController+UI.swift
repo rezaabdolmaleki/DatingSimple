@@ -20,6 +20,18 @@ extension SignUpViewController {
     func setupAvatar(){
         avatarImage.layer.cornerRadius = 40
         avatarImage.clipsToBounds = true
+        
+        avatarImage.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(avatarTapedGesture))
+        avatarImage.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func avatarTapedGesture() {
+        let picker = UIImagePickerController()
+        picker.sourceType = .photoLibrary
+        picker.allowsEditing = true
+        picker.delegate = self
+        self.present(picker , animated: true)
     }
     
     func setupFullNameTextField(){
@@ -81,4 +93,22 @@ extension SignUpViewController {
         signInBtn.setAttributedTitle(attributedText, for: UIControl.State.normal)
         
     }
+}
+
+
+extension SignUpViewController : UIImagePickerControllerDelegate , UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let selectedEditedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
+            avatarImage.image = selectedEditedImage
+        }
+        
+        if let selectedOriginalImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            avatarImage.image = selectedOriginalImage
+        }
+        
+        picker.dismiss(animated: true, completion: nil)
+        
+    }
+    
 }
