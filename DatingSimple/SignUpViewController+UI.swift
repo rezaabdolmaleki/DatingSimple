@@ -1,15 +1,11 @@
-//
-//  SignUpViewController+UI.swift
-//  DatingSimple
-//
-//  Created by reza abdolmaleki on 6/24/19.
-//  Copyright © 2019 reza abdolmaleki. All rights reserved.
-//
 
 import UIKit
+import FirebaseAuth
+import FirebaseDatabase
+import FirebaseStorage
+import ProgressHUD
 
 extension SignUpViewController {
-    
     func setupTitleLabel(){
         let title = "Sign Up"
         
@@ -22,16 +18,15 @@ extension SignUpViewController {
         avatarImage.clipsToBounds = true
         
         avatarImage.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(avatarTapedGesture))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAvatar))
         avatarImage.addGestureRecognizer(tapGesture)
     }
-    
-    @objc func avatarTapedGesture() {
+    @objc func tapAvatar(){
         let picker = UIImagePickerController()
         picker.sourceType = .photoLibrary
         picker.allowsEditing = true
         picker.delegate = self
-        self.present(picker , animated: true)
+        self.present(picker,animated: true)
     }
     
     func setupFullNameTextField(){
@@ -93,22 +88,49 @@ extension SignUpViewController {
         signInBtn.setAttributedTitle(attributedText, for: UIControl.State.normal)
         
     }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
 }
 
-
-extension SignUpViewController : UIImagePickerControllerDelegate , UINavigationControllerDelegate {
-    
+extension SignUpViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let selectedEditedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
+            imageProfile = selectedEditedImage
             avatarImage.image = selectedEditedImage
         }
         
         if let selectedOriginalImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            imageProfile = selectedOriginalImage
             avatarImage.image = selectedOriginalImage
         }
-        
         picker.dismiss(animated: true, completion: nil)
-        
     }
     
+    func validateInputValues(){
+        guard let fullName = fullNameTextField.text, !fullName.isEmpty else {
+            ProgressHUD.showError("Please enter your full name!")
+            return
+        }
+        
+        guard let email = emailTextField.text, !email.isEmpty else {
+            ProgressHUD.showError("Please enter your Email address.")
+            return
+        }
+        
+        guard let password = passwordTextField.text, !password.isEmpty else {
+            ProgressHUD.showError("Please enter a valid password.")
+            return
+        }
+    }
+    
+    func signUp(){
+        Api.User.signUp(withUserName: self.fullNameTextField.text!, email: self.emailTextField.text!, password: self.passwordTextField.text!, image: self.imageProfile, onSuccess: {
+            print("\n\n\n\nDone.")
+                ProgressHUD.showSuccess()
+        }) { (errorMessages) in
+            ProgressHUD.showError(errorMessages)
+        }
+    }
 }
